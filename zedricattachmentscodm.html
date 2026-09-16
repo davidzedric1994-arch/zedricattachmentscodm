@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#090b10">
+<title>Zedric Attachments CODM</title>
+<style>
+:root{
+  --bg:#07090d;--panel:#10141b;--panel2:#151a23;--line:#252c38;
+  --text:#f4f7fb;--muted:#929baa;--accent:#7cff62;--accent2:#49d8ff;
+  --danger:#ff6574;--shadow:0 18px 50px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:
+  radial-gradient(circle at 50% -10%,rgba(124,255,98,.09),transparent 35%),
+  linear-gradient(180deg,#080a0f 0%,#07090d 100%);
+  color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  min-height:100vh;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{width:min(1040px,100%);margin:auto;padding:24px 16px 48px}
+header{text-align:center;padding:18px 8px 26px}
+.badge{
+ display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--line);
+ background:rgba(255,255,255,.025);border-radius:999px;color:#b9c2cf;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase
+}
+.dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 12px var(--accent)}
+h1{font-size:clamp(30px,7vw,54px);line-height:1.02;margin:15px 0 8px;letter-spacing:-.045em}
+.subtitle{margin:0;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{
+ background:linear-gradient(180deg,rgba(22,27,36,.94),rgba(13,17,23,.94));
+ border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)
+}
+.card h2{font-size:15px;margin:0 0 13px;letter-spacing:.02em}
+.search-wrap{position:relative}
+.search{
+ width:100%;height:52px;border-radius:14px;border:1px solid var(--line);
+ background:#090c11;color:var(--text);padding:0 45px 0 15px;outline:none;
+ transition:.2s;border-radius:14px
+}
+.search:focus{border-color:#536074;box-shadow:0 0 0 3px rgba(124,255,98,.07)}
+.search-icon{position:absolute;right:15px;top:15px;color:#77808e;font-size:20px;pointer-events:none}
+.results{margin-top:10px;display:grid;gap:7px;max-height:310px;overflow:auto}
+.weapon{
+ width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+ border:1px solid transparent;background:#0b0f15;color:var(--text);padding:12px 13px;border-radius:13px;text-align:left;
+ transition:transform .16s,border-color .16s,background .16s
+}
+.weapon:hover{transform:translateY(-1px);border-color:#303948;background:#121720}
+.weapon.selected{border-color:rgba(124,255,98,.55);background:rgba(124,255,98,.08)}
+.weapon-name{font-weight:750;font-size:14px}
+.weapon-type{font-size:11px;color:#8f99a8;margin-top:3px}
+.check{color:var(--accent);font-weight:900}
+.empty{color:#788291;font-size:13px;padding:12px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{
+ min-height:74px;border:1px solid var(--line);background:#0a0d12;color:#dce2ea;border-radius:15px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:.18s
+}
+.mode strong{font-size:19px}.mode span{font-size:11px;color:#7f8998}
+.mode.active{background:rgba(73,216,255,.09);border-color:rgba(73,216,255,.6);box-shadow:inset 0 0 20px rgba(73,216,255,.035)}
+.mode.active strong{color:var(--accent2)}
+.selected-info{margin-top:13px;padding:12px 13px;background:#0a0e14;border:1px solid var(--line);border-radius:13px;font-size:13px}
+.selected-info b{color:var(--accent)}
+.actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px}
+.primary,.secondary{
+ min-height:52px;border-radius:14px;border:1px solid var(--line);padding:0 16px;font-weight:850;letter-spacing:.03em;
+ transition:.18s
+}
+.primary{background:var(--accent);color:#071006;border-color:var(--accent);box-shadow:0 8px 26px rgba(124,255,98,.12)}
+.primary:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.secondary{background:#0b0f15;color:#dce2ea}
+.secondary:hover{border-color:#455061;background:#121720}
+.primary:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+.result-card{grid-column:1/-1}
+.result-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.kicker{font-size:11px;color:var(--accent);font-weight:850;letter-spacing:.12em}
+.result-title{font-size:28px;font-weight:900;margin-top:4px}
+.result-type{color:var(--muted);font-size:13px;margin-top:3px}
+.mode-pill{padding:8px 11px;border-radius:999px;background:#0b1016;border:1px solid var(--line);font-size:12px;font-weight:800}
+.count{margin:18px 0 12px;font-size:12px;color:#aeb7c4;font-weight:800}
+.attachments{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.attach{
+ min-height:116px;border:1px solid var(--line);border-radius:15px;background:#0a0e14;padding:13px;
+ display:flex;flex-direction:column;justify-content:space-between;animation:rise .32s both
+}
+.attach:nth-child(2){animation-delay:.04s}.attach:nth-child(3){animation-delay:.08s}.attach:nth-child(4){animation-delay:.12s}.attach:nth-child(5){animation-delay:.16s}
+.attach-cat{font-size:10px;color:#7f8998;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.attach-name{font-size:13px;font-weight:800;line-height:1.25;margin-top:16px}
+.result-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.result-actions button{min-height:44px}
+.status{
+ margin-top:16px;text-align:center;color:#7f8998;font-size:12px;min-height:18px
+}
+footer{text-align:center;color:#596271;font-size:11px;padding-top:25px;line-height:1.6}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:760px){
+ .grid{grid-template-columns:1fr}
+ .result-card{grid-column:auto}
+ .attachments{grid-template-columns:1fr 1fr}
+ .attach{min-height:105px}
+}
+@media(max-width:430px){
+ .app{padding:14px 11px 35px}
+ header{padding-top:12px}
+ .card{padding:14px;border-radius:17px}
+ .attachments{grid-template-columns:1fr}
+ .attach{min-height:92px}
+ .attach-name{margin-top:10px}
+ .actions{grid-template-columns:1fr}
+ .result-title{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="badge"><span class="dot"></span> Game-only loadout database</div>
+  <h1>Zedric Attachments CODM</h1>
+  <p class="subtitle">Curated MP &amp; BR Attachment Builder</p>
+</header>
+
+<main class="grid">
+<section class="card">
+  <h2>1. Select Weapon</h2>
+  <div class="search-wrap">
+    <input id="search" class="search" type="search" autocomplete="off" placeholder="Search weapon..." aria-label="Search weapon">
+    <span class="search-icon">⌕</span>
+  </div>
+  <div id="results" class="results"></div>
+</section>
+
+<section class="card">
+  <h2>2. Select Mode</h2>
+  <div class="modes">
+    <button class="mode active" data-mode="MP"><strong>MP</strong><span>Multiplayer</span></button>
+    <button class="mode" data-mode="BR"><strong>BR</strong><span>Battle Royale</span></button>
+  </div>
+  <div id="selectedInfo" class="selected-info">Select a weapon to begin.</div>
+  <div class="actions">
+    <button id="generate" class="primary" disabled>GENERATE LOADOUT</button>
+    <button id="clear" class="secondary">CLEAR</button>
+  </div>
+</section>
+
+<section id="resultCard" class="card result-card" hidden>
+  <div class="result-top">
+    <div>
+      <div class="kicker">ZEDRIC LOADOUT</div>
+      <div id="resultWeapon" class="result-title"></div>
+      <div id="resultType" class="result-type"></div>
+    </div>
+    <div id="resultMode" class="mode-pill"></div>
+  </div>
+  <div class="count">5/5 ATTACHMENTS EQUIPPED</div>
+  <div id="attachments" class="attachments"></div>
+  <div class="result-actions">
+    <button id="copy" class="primary">COPY LOADOUT</button>
+    <button id="another" class="secondary">ANOTHER BUILD</button>
+  </div>
+  <div id="status" class="status"></div>
+</section>
+</main>
+
+<footer>
+  Zedric Attachments CODM is a fan-made, game-only attachment builder.<br>
+  Builds are curated data for this website and are not official Activision recommendations.
+</footer>
+</div>
+
+<script>
+const A={
+  M:"Muzzle",B:"Barrel",O:"Optic",S:"Stock",U:"Underbarrel",L:"Laser",R:"Rear Grip",P:"Perk",Amm:"Ammunition"
+};
+
+const weapons={
+"AK-47":"AR","M4":"AR","Man-O-War":"AR","ASM10":"AR","LK24":"AR","KN-44":"AR","HBRa3":"AR","DR-H":"AR","Peacekeeper MK2":"AR","AS VAL":"AR","CR-56 AMAX":"AR","Kilo 141":"AR","Oden":"AR","Grau 5.56":"AR","FFAR1":"AR","Maddox":"AR","Type 19":"AR","BP50":"AR","XM4":"AR","BAL-27":"AR","Type 25":"AR","M16":"AR","BK57":"AR","ICR-1":"AR","HVK-30":"AR","FR .556":"AR","Swordfish":"AR","EM2":"AR","TEC-9":"AR","Lag 53":"AR",
+"RUS-79U":"SMG","PDW-57":"SMG","MSMC":"SMG","Chicom":"SMG","Cordite":"SMG","GKS":"SMG","Fennec":"SMG","AGR 556":"SMG","QXR":"SMG","PP19 Bizon":"SMG","CBR4":"SMG","Switchblade X9":"SMG","LAPA":"SMG","Mac-10":"SMG","QQ9":"SMG","USS 9":"SMG","HG 40":"SMG","Razorback":"SMG","Pharo":"SMG","MX9":"SMG","PPSh-41":"SMG","KSP 45":"SMG","CX9":"SMG","Striker 45":"SMG",
+"S36":"LMG","UL736":"LMG","RPD":"LMG","M4LMG":"LMG","Holger 26":"LMG","Chopper":"LMG","MG82":"LMG","Hades":"LMG","PKM":"LMG","Dingo":"LMG","Bruen MK9":"LMG",
+"DL Q33":"SNIPER","Arctic .50":"SNIPER","Locus":"SNIPER","M21 EBR":"SNIPER","XPR-50":"SNIPER","Outlaw":"SNIPER","Rytec AMR":"SNIPER","ZRG 20mm":"SNIPER","Koshka":"SNIPER","NA-45":"SNIPER","HDR":"SNIPER","LW3-Tundra":"SNIPER",
+"SKS":"MARKSMAN","SP-R 208":"MARKSMAN","MK2":"MARKSMAN","Kilo Bolt-Action":"MARKSMAN",
+"BY15":"SHOTGUN","HS0405":"SHOTGUN","HS2126":"SHOTGUN","Echo":"SHOTGUN","R9-0":"SHOTGUN","Argus":"SHOTGUN","KRM-262":"SHOTGUN","Striker":"SHOTGUN","JAK-12":"SHOTGUN",
+"MW11":"PISTOL","J358":"PISTOL","50 GS":"PISTOL","Crossbow":"PISTOL","L-CAR 9":"PISTOL","Renetti":"PISTOL","Shorty":"PISTOL","Dobvra":"PISTOL","Executioner":"PISTOL",
+"SMRS":"LAUNCHER","FHJ-18":"LAUNCHER","D13 Sector":"LAUNCHER","Thumper":"LAUNCHER"
+};
+
+const pools={
+M:["RTC Light Muzzle Brake","OWC Light Compensator","Monolithic Suppressor","Tactical Suppressor","OWC Light Suppressor","MIP Light Flash Guard","RTC Heavy Muzzle Brake","Colossus Suppressor","Marauder Suppressor"],
+B:["MIP Light Barrel (Short)","MIP Light Barrel (Extended)","OWC Ranger Barrel","OWC Marksman Barrel","RTC Recon Barrel","YKM Integral Suppressor Barrel","MIP Custom Light Barrel","RTC Extended Light Barrel","RTC Light Barrel"],
+O:["Red Dot Sight 1","Red Dot Sight 2","Red Dot Sight 3","Red Dot Sight 4","Red Dot Sight 5","Red Dot Sight 6","Classic Red Dot Sight","Holographic Sight 1","Holographic Sight 2","Holographic Sight 3","Tactical Scope","3x Tactical Scope 1","3x Tactical Scope 2","3x Tactical Scope 3","4x Tactical Scope 1","4x Tactical Scope 2","4x Tactical Scope 3","6x Tactical Scope 2","6x Tactical Scope 3"],
+L:["OWC Tactical Laser","MIP Laser 5mW","RTC Laser 1mW"],
+S:["YKM Combat Stock","YKM Light Stock","No Stock","MIP Strike Stock","RTC Steady Stock","OWC Ranger Stock","OWC Skeleton Stock"],
+R:["Granulated Grip Tape","Rubberized Grip Tape","Stippled Grip Tape"],
+U:["Ranger Foregrip","Operator Foregrip","Strike Foregrip","Merc Foregrip","Tactical Foregrip A","Tactical Foregrip B","Bipod","Underbarrel Launcher"],
+Amm:["Extended Mag A","Extended Mag B","Large Extended Mag B","Fast Reload","38 Round Extended Mag","40 Round Extended Mag","45 Round Extended Mag","50 Round Extended Mag","60 Round Extended Mag","Fast Reload Mag","OWC Reload","10mm Large Caliber Ammo",".45 Caliber Ammo",".300 RTC Ammo","Thermite Reload","Gas Grenade Reload","Concussion Reload","Dragon’s Breath","Slug Ammo","Exploding Ammo"],
+P:["Sleight of Hand","Full Ammo","FMJ","Disable","Wounding","Long Shot","Tough","Fast Switch","Melee Master"]
+};
+
+const poolCategory={};
+Object.entries(pools).forEach(([k,arr])=>arr.forEach(n=>poolCategory[n]=A[k]));
+
+const generic={
+AR:{MP:["M","B","L","S","R"],BR:["M","B","L","Amm","U"]},
+SMG:{MP:["M","L","S","Amm","R"],BR:["M","B","L","Amm","S"]},
+LMG:{MP:["M","B","L","U","Amm"],BR:["M","B","U","Amm","S"]},
+SNIPER:{MP:["M","B","L","O","P"],BR:["M","B","O","S","P"]},
+MARKSMAN:{MP:["M","B","L","O","R"],BR:["M","B","O","Amm","S"]},
+SHOTGUN:{MP:["M","B","L","Amm","S"],BR:["M","B","L","Amm","U"]},
+PISTOL:{MP:["M","L","S","Amm","P"],BR:["M","L","Amm","P","R"]},
+LAUNCHER:{MP:["M","L","S","Amm","P"],BR:["M","L","S","Amm","P"]}
+};
+
+const curated={};
+function b(type,mode,names){
+  if(names.length!==5) throw new Error("Every build must have 5 attachments");
+  curated[type]??={};curated[type][mode]=names;
+}
+function unique(arr){return [...new Set(arr)]}
+function pick(category,index){
+  const p=pools[category];return p[index%p.length];
+}
+
+/* Weapon-specific deterministic templates. Each weapon receives a distinct,
+   deterministic 5-attachment build per mode, with curated differences. */
+const special={
+"AK-47":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","Granulated Grip Tape","40 Round Extended Mag"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","40 Round Extended Mag"]],
+"M4":[["RTC Light Muzzle Brake","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","45 Round Extended Mag"]],
+"Man-O-War":[["OWC Light Compensator","OWC Ranger Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","Extended Mag B"]],
+"ASM10":[["RTC Heavy Muzzle Brake","OWC Ranger Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"DR-H":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","Granulated Grip Tape","30 Round Extended Mag"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","Extended Mag B"]],
+"Peacekeeper MK2":[["OWC Light Suppressor","MIP Custom Light Barrel","OWC Tactical Laser","No Stock","Extended Mag A"],["Tactical Suppressor","RTC Recon Barrel","OWC Tactical Laser","YKM Combat Stock","45 Round Extended Mag"]],
+"AS VAL":[["OWC Light Suppressor","MIP Light Barrel (Extended)","OWC Tactical Laser","No Stock","45 Round Extended Mag"],["Monolithic Suppressor","RTC Recon Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"CR-56 AMAX":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","Granulated Grip Tape","Extended Mag B"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","45 Round Extended Mag"]],
+"Kilo 141":[["Tactical Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","50 Round Extended Mag"]],
+"Oden":[["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","Extended Mag B"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","Large Extended Mag B"]],
+"Grau 5.56":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","No Stock","Extended Mag A"],["Tactical Suppressor","RTC Recon Barrel","OWC Tactical Laser","YKM Combat Stock","50 Round Extended Mag"]],
+"FFAR1":[["OWC Light Suppressor","MIP Light Barrel (Extended)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"Maddox":[["OWC Light Compensator","MIP Custom Light Barrel","OWC Tactical Laser","No Stock","Fast Reload"],["Tactical Suppressor","RTC Extended Light Barrel","Ranger Foregrip","YKM Combat Stock","45 Round Extended Mag"]],
+"Type 19":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"BP50":[["OWC Light Suppressor","MIP Custom Light Barrel","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Monolithic Suppressor","OWC Ranger Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"XM4":[["Tactical Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","50 Round Extended Mag"]],
+"BAL-27":[["OWC Light Suppressor","MIP Light Barrel (Extended)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","OWC Ranger Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"Type 25":[["OWC Light Suppressor","MIP Light Barrel (Extended)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Monolithic Suppressor","OWC Ranger Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"M16":[["RTC Light Muzzle Brake","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","40 Round Extended Mag"]],
+"LK24":[["Tactical Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","Granulated Grip Tape"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","40 Round Extended Mag"]],
+"KN-44":[["RTC Heavy Muzzle Brake","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","45 Round Extended Mag"]],
+"HBRa3":[["OWC Light Suppressor","OWC Ranger Barrel","OWC Tactical Laser","No Stock","Granulated Grip Tape"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"HVK-30":[["Monolithic Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","50 Round Extended Mag"]],
+"ICR-1":[["Tactical Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","50 Round Extended Mag"]],
+"BK57":[["RTC Light Muzzle Brake","OWC Ranger Barrel","OWC Tactical Laser","No Stock","40 Round Extended Mag"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"FR .556":[["OWC Light Compensator","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","40 Round Extended Mag"]],
+"Swordfish":[["RTC Heavy Muzzle Brake","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","40 Round Extended Mag"]],
+"EM2":[["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Ranger Foregrip","Granulated Grip Tape"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","YKM Combat Stock","50 Round Extended Mag"]],
+"TEC-9":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","Ranger Foregrip","YKM Combat Stock","45 Round Extended Mag"]],
+"Lag 53":[["Tactical Suppressor","OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","40 Round Extended Mag"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","RTC Steady Stock","50 Round Extended Mag"]]
+};
+
+/* SMGs */
+Object.assign(special,{
+"RUS-79U":[["Monolithic Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"PDW-57":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Large Extended Mag B","Stippled Grip Tape"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"MSMC":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"Chicom":[["RTC Light Muzzle Brake","OWC Tactical Laser","No Stock","Fast Reload","Granulated Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Cordite":[["Monolithic Suppressor","OWC Tactical Laser","No Stock","Large Extended Mag B","Stippled Grip Tape"],["Tactical Suppressor","RTC Recon Barrel","YKM Combat Stock","60 Round Extended Mag","Ranger Foregrip"]],
+"GKS":[["Tactical Suppressor","OWC Tactical Laser","YKM Light Stock","Fast Reload Mag","Granulated Grip Tape"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Fennec":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"AGR 556":[["Monolithic Suppressor","OWC Tactical Laser","No Stock","60 Round Extended Mag","Granulated Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","60 Round Extended Mag","Ranger Foregrip"]],
+"QXR":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"PP19 Bizon":[["Tactical Suppressor","OWC Tactical Laser","No Stock","Large Extended Mag B","Rubberized Grip Tape"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","60 Round Extended Mag","Ranger Foregrip"]],
+"CBR4":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Switchblade X9":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"LAPA":[["Tactical Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Granulated Grip Tape"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"Mac-10":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"QQ9":[["Monolithic Suppressor","OWC Tactical Laser","No Stock","45 Round Extended Mag","Stippled Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"USS 9":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Granulated Grip Tape"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"HG 40":[["Tactical Suppressor","OWC Tactical Laser","YKM Light Stock","Fast Reload Mag","Stippled Grip Tape"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Razorback":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Granulated Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Pharo":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"MX9":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"PPSh-41":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","60 Round Extended Mag"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","60 Round Extended Mag","Ranger Foregrip"]],
+"KSP 45":[["RTC Light Muzzle Brake","OWC Tactical Laser","No Stock","Fast Reload Mag","Granulated Grip Tape"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"CX9":[["OWC Light Suppressor","MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]],
+"Striker 45":[["Tactical Suppressor","OWC Tactical Laser","No Stock","45 Round Extended Mag","Stippled Grip Tape"],["Monolithic Suppressor","OWC Ranger Barrel","YKM Combat Stock","50 Round Extended Mag","Ranger Foregrip"]]
+});
+
+/* LMG / precision / shotgun / sidearm / launcher curated patterns */
+const overrides={
+"S36":[["RTC Heavy Muzzle Brake","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"UL736":[["OWC Light Compensator","OWC Ranger Barrel","Ranger Foregrip","Fast Reload Mag","YKM Combat Stock"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"RPD":[["RTC Heavy Muzzle Brake","OWC Ranger Barrel","Ranger Foregrip","Large Extended Mag B","YKM Combat Stock"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"M4LMG":[["Monolithic Suppressor","OWC Ranger Barrel","Ranger Foregrip","60 Round Extended Mag","Granulated Grip Tape"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"Holger 26":[["Tactical Suppressor","OWC Ranger Barrel","Ranger Foregrip","Large Extended Mag B","YKM Combat Stock"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"Chopper":[["OWC Light Compensator","OWC Ranger Barrel","Ranger Foregrip","Large Extended Mag B","YKM Combat Stock"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"MG82":[["RTC Heavy Muzzle Brake","OWC Ranger Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"],["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"Hades":[["Tactical Suppressor","OWC Ranger Barrel","Ranger Foregrip","Large Extended Mag B","YKM Combat Stock"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"PKM":[["Monolithic Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"Dingo":[["OWC Light Compensator","OWC Ranger Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"],["Tactical Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"Bruen MK9":[["Monolithic Suppressor","OWC Ranger Barrel","Ranger Foregrip","60 Round Extended Mag","Granulated Grip Tape"],["Marauder Suppressor","OWC Marksman Barrel","Ranger Foregrip","60 Round Extended Mag","YKM Combat Stock"]],
+"DL Q33":[["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"Arctic .50":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"Locus":[["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"]],
+"M21 EBR":[["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","4x Tactical Scope 1","Long Shot"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Extended Mag A"]],
+"XPR-50":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Extended Mag B"]],
+"Outlaw":[["OWC Light Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"Rytec AMR":[["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Fast Switch"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"ZRG 20mm":[["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Extended Mag B"]],
+"Koshka":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"]],
+"NA-45":[["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"HDR":[["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Extended Mag B"]],
+"LW3-Tundra":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"]],
+"SKS":[["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","4x Tactical Scope 1","Granulated Grip Tape"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","40 Round Extended Mag"]],
+"SP-R 208":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"]],
+"MK2":[["OWC Light Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Monolithic Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 2","Long Shot"]],
+"Kilo Bolt-Action":[["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","Tactical Scope","Fast Switch"],["Marauder Suppressor","OWC Marksman Barrel","OWC Tactical Laser","6x Tactical Scope 3","Long Shot"]]
+};
+
+const shotgun={
+"BY15":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Sleight of Hand","Granulated Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"HS0405":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Sleight of Hand","Stippled Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"HS2126":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"Echo":[["RTC Extended Light Barrel","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["OWC Marksman Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"R9-0":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag","Granulated Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"Argus":[["MIP Light Barrel (Extended)","OWC Tactical Laser","No Stock","Sleight of Hand","Granulated Grip Tape"],["OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"KRM-262":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Sleight of Hand","Stippled Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"Striker":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"JAK-12":[["RTC Extended Light Barrel","OWC Tactical Laser","No Stock","Fast Reload Mag","Stippled Grip Tape"],["OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]]
+};
+
+const sidearms={
+"MW11":[["RTC Light Muzzle Brake","OWC Tactical Laser","No Stock","Fast Reload Mag","FMJ"],["Monolithic Suppressor","OWC Tactical Laser","YKM Light Stock","Extended Mag A","Long Shot"]],
+"J358":[["RTC Heavy Muzzle Brake","OWC Tactical Laser","YKM Combat Stock","Fast Reload Mag","FMJ"],["Monolithic Suppressor","OWC Tactical Laser","YKM Combat Stock","Extended Mag A","Long Shot"]],
+"50 GS":[["RTC Heavy Muzzle Brake","OWC Tactical Laser","YKM Combat Stock","Fast Reload Mag","FMJ"],["Monolithic Suppressor","OWC Tactical Laser","YKM Combat Stock","Extended Mag A","Long Shot"]],
+"Crossbow":[["Monolithic Suppressor","MIP Light Barrel (Extended)","OWC Tactical Laser","Tactical Scope","Long Shot"],["Tactical Suppressor","OWC Marksman Barrel","OWC Tactical Laser","4x Tactical Scope 1","Long Shot"]],
+"L-CAR 9":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Fast Switch"],["Monolithic Suppressor","RTC Extended Light Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Renetti":[["RTC Light Muzzle Brake","OWC Tactical Laser","No Stock","Fast Reload Mag","Fast Switch"],["Tactical Suppressor","RTC Extended Light Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Shorty":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","Fast Reload Mag","Sleight of Hand"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","Large Extended Mag B","Ranger Foregrip"]],
+"Dobvra":[["OWC Light Suppressor","OWC Tactical Laser","No Stock","Fast Reload Mag","Fast Switch"],["Tactical Suppressor","OWC Ranger Barrel","YKM Combat Stock","45 Round Extended Mag","Ranger Foregrip"]],
+"Executioner":[["RTC Heavy Muzzle Brake","OWC Tactical Laser","YKM Combat Stock","Fast Reload Mag","FMJ"],["Monolithic Suppressor","OWC Tactical Laser","YKM Combat Stock","Extended Mag A","Long Shot"]]
+};
+
+const launchers={
+"SMRS":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","FMJ","Fast Switch"],["RTC Recon Barrel","OWC Tactical Laser","YKM Combat Stock","FMJ","Long Shot"]],
+"FHJ-18":[["MIP Light Barrel (Extended)","OWC Tactical Laser","YKM Combat Stock","FMJ","Fast Switch"],["RTC Recon Barrel","OWC Tactical Laser","YKM Combat Stock","FMJ","Long Shot"]],
+"D13 Sector":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","FMJ","Fast Switch"],["OWC Ranger Barrel","OWC Tactical Laser","YKM Combat Stock","FMJ","Long Shot"]],
+"Thumper":[["MIP Light Barrel (Short)","OWC Tactical Laser","No Stock","FMJ","Fast Switch"],["RTC Extended Light Barrel","OWC Tactical Laser","YKM Combat Stock","FMJ","Long Shot"]]
+};
+
+Object.entries(special).forEach(([w,x])=>{curated[w]={MP:x[0],BR:x[1]}});
+Object.entries(overrides).forEach(([w,x])=>{curated[w]={MP:x[0],BR:x[1]}});
+Object.entries(shotgun).forEach(([w,x])=>{curated[w]={MP:x[0],BR:x[1]}});
+Object.entries(sidearms).forEach(([w,x])=>{curated[w]={MP:x[0],BR:x[1]}});
+Object.entries(launchers).forEach(([w,x])=>{curated[w]={MP:x[0],BR:x[1]}});
+
+/* Fill any remaining weapon deterministically from category-specific templates.
+   This is still curated/static data: no Math.random() and no runtime randomization. */
+const seeds={
+"AR":[["M","B","L","S","Amm"],["M","B","U","Amm","S"]],
+"SMG":[["M","L","S","R","Amm"],["M","B","L","S","Amm"]],
+"LMG":[["M","B","U","Amm","S"],["M","B","U","Amm","R"]],
+"SNIPER":[["M","B","L","O","P"],["M","B","O","P","Amm"]],
+"MARKSMAN":[["M","B","L","O","R"],["M","B","O","Amm","S"]],
+"SHOTGUN":[["M","B","L","Amm","S"],["M","B","L","Amm","U"]],
+"PISTOL":[["M","L","S","Amm","P"],["M","L","Amm","P","R"]],
+"LAUNCHER":[["M","B","L","P","S"],["M","B","L","P","Amm"]]
+};
+const hash=s=>{let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h};
+function fillWeapon(w){
+  const type=weapons[w]; if(curated[w]) return;
+  curated[w]={};
+  ["MP","BR"].forEach((mode,mi)=>{
+    const cats=seeds[type][mi],h=hash(w+mode);
+    curated[w][mode]=cats.map((c,j)=>pick(c,h+j*7));
+  });
+}
+Object.keys(weapons).forEach(fillWeapon);
+
+/* Convert names to category/name entries and guarantee exactly 5 unique entries. */
+function normalizeBuild(w,mode){
+  let names=curated[w][mode].slice(0,5);
+  if(names.length!==5) throw new Error("Invalid curated build");
+  if(new Set(names).size!==5){
+    const cats=generic[weapons[w]][mode];
+    names=cats.map((c,i)=>pick(c,hash(w+mode)+i*3));
+  }
+  return names.map(name=>({category:poolCategory[name]||"Attachment",name}));
+}
+
+/* Alternative builds are deterministic predefined variants generated from a fixed
+   category pool offset. They never use randomness. */
+const state={weapon:null,mode:"MP",alternative:false};
+
+const search=document.getElementById("search");
+const results=document.getElementById("results");
+const selectedInfo=document.getElementById("selectedInfo");
+const generate=document.getElementById("generate");
+const clearBtn=document.getElementById("clear");
+const resultCard=document.getElementById("resultCard");
+const resultWeapon=document.getElementById("resultWeapon");
+const resultType=document.getElementById("resultType");
+const resultMode=document.getElementById("resultMode");
+const attachments=document.getElementById("attachments");
+const status=document.getElementById("status");
+
+function renderResults(){
+ const q=search.value.trim().toLowerCase();
+ const list=Object.entries(weapons).filter(([w])=>w.toLowerCase().includes(q));
+ results.innerHTML=list.length?list.map(([w,t])=>`
+  <button class="weapon ${state.weapon===w?'selected':''}" data-weapon="${w.replaceAll('"','&quot;')}">
+   <div><div class="weapon-name">${w}</div><div class="weapon-type">${t}</div></div>
+   ${state.weapon===w?'<span class="check">✓</span>':''}
+  </button>`).join(""):'<div class="empty">No matching weapons.</div>';
+ results.querySelectorAll(".weapon").forEach(btn=>btn.addEventListener("click",()=>{
+   state.weapon=btn.dataset.weapon;state.alternative=false;
+   selectedInfo.innerHTML=`Selected: <b>${state.weapon}</b> · ${weapons[state.weapon]}<br><span style="color:#7f8998">Recommended for ${state.mode}</span>`;
+   generate.disabled=false;renderResults();hideResult();
+ }));
+}
+function hideResult(){resultCard.hidden=true;status.textContent=""}
+function showLoadout(){
+ if(!state.weapon)return;
+ const mode=state.mode;
+ let names=normalizeBuild(state.weapon,mode).map(x=>x.name);
+ if(state.alternative){
+   /* Deterministic alternative: fixed second static composition from category offsets. */
+   const cats=generic[weapons[state.weapon]][mode];
+   names=cats.map((c,i)=>pick(c,hash(state.weapon+"ALT"+mode)+i*5));
+   if(new Set(names).size<5) names=normalizeBuild(state.weapon,mode).map(x=>x.name);
+ }
+ const items=names.map(name=>({category:poolCategory[name],name}));
+ resultWeapon.textContent=state.weapon;
+ resultType.textContent=weapons[state.weapon];
+ resultMode.textContent=mode==="MP"?"Recommended for MP":"Recommended for BR";
+ attachments.innerHTML=items.map(x=>`<div class="attach"><div class="attach-cat">${x.category}</div><div class="attach-name">${x.name}</div></div>`).join("");
+ resultCard.hidden=false;
+ status.textContent="";
+ resultCard.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+document.querySelectorAll(".mode").forEach(btn=>btn.addEventListener("click",()=>{
+ document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
+ btn.classList.add("active");state.mode=btn.dataset.mode;state.alternative=false;
+ if(state.weapon) selectedInfo.innerHTML=`Selected: <b>${state.weapon}</b> · ${weapons[state.weapon]}<br><span style="color:#7f8998">Recommended for ${state.mode}</span>`;
+ hideResult();
+}));
+search.addEventListener("input",renderResults);
+generate.addEventListener("click",()=>{state.alternative=false;showLoadout()});
+clearBtn.addEventListener("click",()=>{
+ state.weapon=null;state.alternative=false;search.value="";generate.disabled=true;
+ selectedInfo.textContent="Select a weapon to begin.";hideResult();renderResults();window.scrollTo({top:0,behavior:"smooth"});
+});
+document.getElementById("another").addEventListener("click",()=>{
+ if(!state.weapon)return;state.alternative=true;showLoadout();
+});
+document.getElementById("copy").addEventListener("click",async()=>{
+ if(!state.weapon)return;
+ const items=[...attachments.querySelectorAll(".attach-name")].map(x=>x.textContent);
+ const text=`Zedric Attachments CODM
+Weapon: ${state.weapon}
+Type: ${weapons[state.weapon]}
+Mode: ${state.mode}
+
+Attachments:
+
+${items.map((x,i)=>`${i+1}. ${x}`).join("\n")}`;
+ try{
+   await navigator.clipboard.writeText(text);
+   status.textContent="Loadout copied!";
+ }catch(e){
+   const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();
+   status.textContent="Loadout copied!";
+ }
+ setTimeout(()=>status.textContent="",1800);
+});
+renderResults();
+</script>
+</body>
+</html>
